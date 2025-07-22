@@ -1,0 +1,354 @@
+
+        /* --- General Styling & Variables --- */
+        :root {
+            --bg-dark-primary: #0f172a; /* slate-900 */
+            --bg-dark-secondary: #1e293b; /* slate-800 */
+            --bg-dark-tertiary: #334155; /* slate-700 */
+            --bg-dark-hover: #475569; /* slate-600 */
+            --border-color: #475569;
+            --text-light-primary: #f1f5f9; /* slate-100 */
+            --text-light-secondary: #94a3b8; /* slate-400 */
+            --accent-primary: #4f46e5; /* indigo-600 */
+            --accent-primary-hover: #4338ca; /* indigo-700 */
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-dark-primary);
+            color: var(--text-light-primary);
+            font-size: 16px;
+        }
+
+        /* --- Layout --- */
+        .adminit-admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .adminit-sidebar {
+            width: 256px;
+            background-color: #152033;
+            border-right: 1px solid var(--border-color);
+            padding: 1rem;
+            flex-shrink: 0;
+        }
+
+        .adminit-main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .adminit-page {
+            display: none;
+        }
+
+        .adminit-page.adminit-active {
+            display: block;
+        }
+
+        /* --- Sidebar --- */
+        .adminit-sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        .adminit-sidebar-header .adminit-icon {
+            color: var(--accent-primary);
+        }
+
+        .adminit-sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .adminit-sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-light-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+            margin-bottom: 0.5rem;
+        }
+
+        .adminit-sidebar nav a:hover {
+            background-color: var(--bg-dark-tertiary);
+            color: var(--text-light-primary);
+        }
+
+        .adminit-sidebar nav a.adminit-active {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        
+        /* --- General Components --- */
+        .adminit-page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .adminit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .adminit-btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .adminit-btn-primary:hover {
+            background-color: var(--accent-primary-hover);
+        }
+        
+        .adminit-btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .adminit-btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .adminit-card {
+            background-color: var(--bg-dark-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        /* --- Table --- */
+        .adminit-table-container {
+            background-color: var(--bg-dark-secondary);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem;
+        }
+
+        thead {
+            background-color: #152033;
+            color: var(--text-light-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        tbody tr {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        tbody tr:hover {
+            background-color: #1a273d;
+        }
+        
+        .adminit-action-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light-secondary);
+            padding: 0.5rem;
+        }
+        .adminit-action-buttons button:hover {
+            color: var(--text-light-primary);
+        }
+
+        /* --- Modal --- */
+        .adminit-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .adminit-modal-overlay.adminit-show {
+            display: flex;
+        }
+
+        .adminit-modal-content {
+            background-color: var(--bg-dark-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        
+        .adminit-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .adminit-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        
+        .adminit-modal-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .adminit-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .adminit-form-group label {
+            font-weight: 500;
+            color: var(--text-light-secondary);
+        }
+        
+        .adminit-form-group input, .adminit-form-group select, .adminit-form-group textarea {
+            width: 100%;
+            background-color: var(--bg-dark-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: var(--text-light-primary);
+            font-size: 1rem;
+        }
+        
+        .adminit-form-group input:focus, .adminit-form-group select:focus, .adminit-form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-primary-hover);
+        }
+        
+        .adminit-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+        
+        .adminit-color-picker, .adminit-icon-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .adminit-color-picker button, .adminit-icon-picker button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .adminit-color-picker button.adminit-selected, .adminit-icon-picker button.adminit-selected {
+            border-color: var(--text-light-primary);
+        }
+        
+        .adminit-icon-picker button {
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-dark-tertiary);
+            color: var(--text-light-primary);
+        }
+        .adminit-icon-picker button.adminit-selected {
+            background-color: var(--accent-primary);
+        }
+
+        /* --- Flowchart Editor --- */
+        .adminit-flowchart-container {
+            background-color: #152033;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            min-height: 400px;
+        }
+        
+        .adminit-flowchart-node {
+            background-color: var(--bg-dark-secondary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid;
+        }
+        
+        .adminit-flowchart-node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .adminit-flowchart-node-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .adminit-flowchart-node-icon {
+            margin-top: 4px;
+        }
+        
+        .adminit-flowchart-node-text h4 {
+            margin: 0 0 0.25rem 0;
+            font-weight: bold;
+        }
+        
+        .adminit-flowchart-node-text p {
+            margin: 0;
+            color: var(--text-light-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .adminit-flowchart-node-children {
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--border-color);
+            margin-left: 1rem; /* Aligns with icon */
+        }
+        
+        .adminit-flowchart-node[data-type="question"] { border-color: #3b82f6; }
+        .adminit-flowchart-node[data-type="solution"] { border-color: var(--success-color); }
+        .adminit-flowchart-node[data-type="contact"] { border-color: var(--danger-color); }
+

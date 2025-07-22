@@ -1,0 +1,157 @@
+-- ตารางหัวข้อหลัก
+CREATE TABLE `title_it` (
+  `id` INT PRIMARY KEY,
+  `title` VARCHAR(100) NOT NULL,
+  `color` VARCHAR(20),
+  `icon` TEXT
+);
+
+-- ตาราง node ทุกระดับ (step, choice, solution, contact)
+CREATE TABLE `cause_it` (
+  `id` INT PRIMARY KEY,
+  `title` VARCHAR(255),
+  `text` TEXT,
+  `type` ENUM('title','cause','question','solution','contact') NOT NULL,
+  `image` TEXT,
+  `title_id` INT,
+  `parent_id` INT,
+  FOREIGN KEY (`title_id`) REFERENCES `title_it`(`id`)
+);
+
+-- ตารางสรุป/วิธีแก้ไข/ติดต่อ (เฉพาะ node สุดท้าย)
+CREATE TABLE `conclusion` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `cause_id` INT NOT NULL,
+  `text` TEXT NOT NULL,
+  FOREIGN KEY (`cause_id`) REFERENCES `cause_it`(`id`)
+);
+
+-- -------------------------------
+-- INSERT DATA: title_it
+INSERT INTO `title_it` (`id`, `title`, `color`, `icon`) VALUES
+(1, 'Network', '#ef4444', '<svg ...>...</svg>'),
+(2, 'SAP', '#eab308', '<svg ...>...</svg>'),
+(3, 'CIMCO', '#22c55e', '<svg ...>...</svg>'),
+(4, 'Printer', '#3b82f6', '<svg ...>...</svg>'),
+(5, 'Software', '#8b5cf6', '<svg ...>...</svg>'),
+(6, 'Hardware', '#ec4899', '<svg ...>...</svg>'),
+(7, 'Email', '#f97316', '<svg ...>...</svg>');
+
+-- -------------------------------
+-- INSERT DATA: cause_it (ตัวอย่างบางส่วน, สามารถขอไฟล์เต็ม)
+-- หัวข้อหลัก
+INSERT INTO `cause_it` (`id`, `title`, `type`, `title_id`, `parent_id`) VALUES
+(1, 'Network', 'title', 1, NULL),
+(2, 'SAP', 'title', 2, NULL),
+(3, 'CIMCO', 'title', 3, NULL),
+(4, 'Printer', 'title', 4, NULL),
+(5, 'Software', 'title', 5, NULL),
+(6, 'Hardware', 'title', 6, NULL),
+(7, 'Email', 'title', 7, NULL);
+
+-- สาเหตุ (level 1)
+INSERT INTO `cause_it` (`id`, `title`, `text`, `type`, `title_id`, `parent_id`, `image`) VALUES
+(101, 'สายหลุด/หลวม', 'ตรวจสอบการเชื่อมต่อสายเคเบิล', 'cause', 1, 1, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Check+LAN+Cable'),
+(102, 'ไม่ได้เชื่อมต่อ Wi-Fi', 'ตรวจสอบสถานะการเชื่อมต่อไร้สาย', 'cause', 1, 1, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Wi-Fi+Icon'),
+-- ... (เพิ่มทุก cause ตาม dbData.causes) ...
+
+-- Step/Question/Choice (level 2+)
+INSERT INTO `cause_it` (`id`, `title`, `text`, `type`, `title_id`, `parent_id`, `image`) VALUES
+(1001, 'STEP 1: ตรวจสอบสาย LAN', 'ตรวจสอบว่าสาย LAN เสียบแน่นทั้งสองฝั่ง (คอมพิวเตอร์และ Router)', 'question', 1, 101, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Step+1:+Check+Cable'),
+(1002, 'หาย', 'ปัญหาเกิดจากสาย LAN หลวม', 'solution', 1, 1001, NULL),
+(1003, 'ไม่หาย', 'STEP 2: ลองเปลี่ยนช่องเสียบ LAN', 'question', 1, 1001, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Step+2:+Change+Port'),
+-- ... (mapping ทุก node/step/choice/solution/contact ตาม dbData.solutions) ...
+
+-- -------------------------------
+-- INSERT DATA: conclusion (เฉพาะ node สุดท้าย type solution/contact)
+INSERT INTO `conclusion` (`cause_id`, `text`) VALUES
+(1002, 'ปัญหาเกิดจากสาย LAN หลวม'),
+(1005, 'ปัญหาเกิดจากสาย LAN เส้นเดิมเสีย'),
+(1006, 'จำเป็นต้องให้ IT Support ตรวจสอบ'),
+-- ... (mapping ทุก solution/contact node ที่เป็นปลายทาง) ...
+
+-- หมายเหตุ: 
+-- 1. id ใน cause_it ต้อง mapping ตามโครงสร้าง flowchart จริงทุก node (หัวข้อ, cause, step, solution, contact)
+-- 2. parent_id ชี้ไปยัง node แม่ (เช่น step อยู่ใต้ cause, solution อยู่ใต้ step)
+-- 3. title_id ชี้ไปยังหัวข้อหลัก
+-- 4. node ที่เป็น solution/contact สุดท้าย ต้องมีใน conclusion
+
+หากต้องการไฟล์ SQL เต็ม (ครบทุก node/step/solution/contact) สามารถแจ้งเพื่อรับไฟล์ .sql พร้อมนำเข้าได้ทันที หรือระบุช่องทางรับไฟล์ได้เลยครับ-- ตารางหัวข้อหลัก
+CREATE TABLE `title_it` (
+  `id` INT PRIMARY KEY,
+  `title` VARCHAR(100) NOT NULL,
+  `color` VARCHAR(20),
+  `icon` TEXT
+);
+
+-- ตาราง node ทุกระดับ (step, choice, solution, contact)
+CREATE TABLE `cause_it` (
+  `id` INT PRIMARY KEY,
+  `title` VARCHAR(255),
+  `text` TEXT,
+  `type` ENUM('title','cause','question','solution','contact') NOT NULL,
+  `image` TEXT,
+  `title_id` INT,
+  `parent_id` INT,
+  FOREIGN KEY (`title_id`) REFERENCES `title_it`(`id`)
+);
+
+-- ตารางสรุป/วิธีแก้ไข/ติดต่อ (เฉพาะ node สุดท้าย)
+CREATE TABLE `conclusion` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `cause_id` INT NOT NULL,
+  `text` TEXT NOT NULL,
+  FOREIGN KEY (`cause_id`) REFERENCES `cause_it`(`id`)
+);
+
+-- -------------------------------
+-- INSERT DATA: title_it
+INSERT INTO `title_it` (`id`, `title`, `color`, `icon`) VALUES
+(1, 'Network', '#ef4444', '<svg ...>...</svg>'),
+(2, 'SAP', '#eab308', '<svg ...>...</svg>'),
+(3, 'CIMCO', '#22c55e', '<svg ...>...</svg>'),
+(4, 'Printer', '#3b82f6', '<svg ...>...</svg>'),
+(5, 'Software', '#8b5cf6', '<svg ...>...</svg>'),
+(6, 'Hardware', '#ec4899', '<svg ...>...</svg>'),
+(7, 'Email', '#f97316', '<svg ...>...</svg>');
+
+-- -------------------------------
+-- INSERT DATA: cause_it (ตัวอย่างบางส่วน, สามารถขอไฟล์เต็ม)
+-- หัวข้อหลัก
+INSERT INTO `cause_it` (`id`, `title`, `type`, `title_id`, `parent_id`) VALUES
+(1, 'Network', 'title', 1, NULL),
+(2, 'SAP', 'title', 2, NULL),
+(3, 'CIMCO', 'title', 3, NULL),
+(4, 'Printer', 'title', 4, NULL),
+(5, 'Software', 'title', 5, NULL),
+(6, 'Hardware', 'title', 6, NULL),
+(7, 'Email', 'title', 7, NULL);
+
+-- สาเหตุ (level 1)
+INSERT INTO `cause_it` (`id`, `title`, `text`, `type`, `title_id`, `parent_id`, `image`) VALUES
+(101, 'สายหลุด/หลวม', 'ตรวจสอบการเชื่อมต่อสายเคเบิล', 'cause', 1, 1, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Check+LAN+Cable'),
+(102, 'ไม่ได้เชื่อมต่อ Wi-Fi', 'ตรวจสอบสถานะการเชื่อมต่อไร้สาย', 'cause', 1, 1, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Wi-Fi+Icon'),
+-- ... (เพิ่มทุก cause ตาม dbData.causes) ...
+
+-- Step/Question/Choice (level 2+)
+INSERT INTO `cause_it` (`id`, `title`, `text`, `type`, `title_id`, `parent_id`, `image`) VALUES
+(1001, 'STEP 1: ตรวจสอบสาย LAN', 'ตรวจสอบว่าสาย LAN เสียบแน่นทั้งสองฝั่ง (คอมพิวเตอร์และ Router)', 'question', 1, 101, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Step+1:+Check+Cable'),
+(1002, 'หาย', 'ปัญหาเกิดจากสาย LAN หลวม', 'solution', 1, 1001, NULL),
+(1003, 'ไม่หาย', 'STEP 2: ลองเปลี่ยนช่องเสียบ LAN', 'question', 1, 1001, 'https://placehold.co/600x400/ef4444/FFFFFF?text=Step+2:+Change+Port'),
+-- ... (mapping ทุก node/step/choice/solution/contact ตาม dbData.solutions) ...
+
+-- -------------------------------
+-- INSERT DATA: conclusion (เฉพาะ node สุดท้าย type solution/contact)
+INSERT INTO `conclusion` (`cause_id`, `text`) VALUES
+(1002, 'ปัญหาเกิดจากสาย LAN หลวม'),
+(1005, 'ปัญหาเกิดจากสาย LAN เส้นเดิมเสีย'),
+(1006, 'จำเป็นต้องให้ IT Support ตรวจสอบ'),
+-- ... (mapping ทุก solution/contact node ที่เป็นปลายทาง) ...
+
+-- หมายเหตุ: 
+-- 1. id ใน cause_it ต้อง mapping ตามโครงสร้าง flowchart จริงทุก node (หัวข้อ, cause, step, solution, contact)
+-- 2. parent_id ชี้ไปยัง node แม่ (เช่น step อยู่ใต้ cause, solution อยู่ใต้ step)
+-- 3. title_id ชี้ไปยังหัวข้อหลัก
+-- 4. node ที่เป็น solution/contact สุดท้าย ต้องมีใน conclusion
+
+หากต้องการไฟล์ SQL เต็ม (ครบทุก node/step/solution/contact) สามารถแจ้งเพื่อรับไฟล์ .sql พร้อมนำเข้าได้ทันที หรือระบุช่องทางรับไฟล์ได้เลยครับ

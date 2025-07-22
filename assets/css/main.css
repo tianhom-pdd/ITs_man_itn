@@ -1,0 +1,434 @@
+/* Icon base style for all .itsmainmn-icon */
+.itsmainmn-icon {
+    width: 1em;
+    height: 1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+.itsmainmn-icon svg {
+    width: 1em;
+    height: 1em;
+    display: block;
+    fill: currentColor;
+}
+       :root {
+            --background-color: #f8fafc;
+            --header-bg: #dc2626; /* Red */
+            --header-text: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.05);
+            --shadow-lg: rgba(0, 0, 0, 0.1);
+            --connector-color: #94a3b8;
+            --success-color: #22c55e;
+            --highlight-color: #f59e0b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .itsmainmn-header {
+            background: var(--header-bg);
+            box-shadow: 0 2px 4px var(--shadow);
+            flex-shrink: 0;
+            z-index: 100; /* กำหนด z-index ให้สูงกว่าส่วนอื่น */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 2rem;
+            position: relative;
+        }
+
+        .itsmainmn-header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .itsmainmn-logo-wrapper {
+            background-color: white;
+            padding: 0.75rem 2.5rem 0.75rem 2rem;
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .itsmainmn-header-logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        .itsmainmn-header-title {
+            color: var(--header-text);
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding-left: 1rem;
+        }
+
+        .itsmainmn-header-search {
+            position: relative;
+            width: 300px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        #search-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        #search-input:focus {
+            outline: none;
+            background-color: rgba(255,255,255,1);
+            color: var(--text-primary);
+            border-color: var(--highlight-color);
+        }
+
+        #search-results-container {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px var(--shadow-lg);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1200; /* z-index สูงสุดเพื่อให้แสดงผลทับทุกอย่าง */
+            border: 1px solid var(--card-border);
+        }
+        .itsmainmn-search-result-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+        }
+        .itsmainmn-search-result-item:last-child {
+            border-bottom: none;
+        }
+        .itsmainmn-search-result-item:hover {
+            background-color: #f1f5f9;
+        }
+        .itsmainmn-search-result-item strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .itsmainmn-search-result-item span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .itsmainmn-page-container {
+            flex-grow: 1;
+            overflow: auto;
+            position: relative;
+            background-color: #f1f5f9;
+        }
+
+        #itsmainmn-flowchart-main-container {
+            display: flex;
+            gap: 4rem;
+            align-items: flex-start;   /* ให้ทุก level เรียงบนแกนเดียวกัน */
+            position: relative;
+            min-height: 100%;
+            padding: 2rem 8rem 2rem 2rem; 
+            box-sizing: border-box;
+        }
+        
+        .itsmainmn-flowchart-level {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: flex-start;   /* เดิม center */
+            min-height: 140px;         /* ปรับความสูงแต่ละ level ให้พอดี node */
+            position: relative;
+        }
+        
+        .itsmainmn-flowchart-node {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem 0.75rem;  /* ลด padding */
+            box-shadow: 0 4px 12px var(--shadow);
+            width: 180px;           /* ปรับขนาดกล่องให้เล็กลง */
+            min-height: 120px ;      /* กำหนดความสูงขั้นต่ำ */
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;      /* <--- เพิ่มตรงนี้ */
+            align-items: stretch;        /* <--- เพิ่มตรงนี้ */
+            gap: 1rem;
+            text-align: left;
+            border-top: 4px solid transparent;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: fadeInNode 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            z-index: 1; /* ให้ node อยู่เหนือเส้นเชื่อม */
+        }
+
+        .itsmainmn-flowchart-level.itsmainmn-visible .itsmainmn-flowchart-node {
+             opacity: 1;
+             transform: translateY(0);
+        }
+        
+        @keyframes fadeInNode {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .itsmainmn-flowchart-node.itsmainmn-active {
+            transform: scale(1.05) translateY(0);
+            border: 3px solid var(--hover-color);
+            background-color: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .itsmainmn-flowchart-node .itsmainmn-icon {
+            width: 1em !important;
+            height: 1em !important;
+            min-width: 16px !important;
+            min-height: 16px !important;
+            max-width: 18px !important;
+            max-height: 18px !important;
+            margin-right: 0.4rem;
+        }
+
+        /* ปรับขนาดไอคอนใน node ให้เล็กจิ๋วทุกโหนด */
+        .itsmainmn-flowchart-node .icon svg,
+        .itsmainmn-flowchart-node .itsmainmn-icon svg {
+            width: 1em !important;
+            height: 1em !important;
+            min-width: 16px !important;
+            min-height: 16px !important;
+            max-width: 18px !important;
+            max-height: 18px !important;
+            vertical-align: middle;
+        }
+
+        .itsmainmn-flowchart-node-text {
+            flex-grow: 1;
+            width: 100%;                /* <--- เพิ่มตรงนี้ */
+            overflow-wrap: break-word;   /* <--- เพิ่มตรงนี้ */
+            font-size: 0.95rem;
+        }
+
+        .itsmainmn-flowchart-node-text h3 {
+            margin: 0;
+            font-size: 1.05rem;     /* ปรับขนาด title ให้เล็กลง */
+            font-weight: 600;
+            word-break: break-word;
+            text-align: left;
+        }
+
+        .itsmainmn-flowchart-node-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0;
+            transition: color 0.3s ease;
+        }
+        
+        .itsmainmn-node-image-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease-in-out;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .itsmainmn-node-image-icon:hover {
+            color: var(--highlight-color);
+            background-color: #f1f5f9;
+        }
+
+        #itsmainmn-connector-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 0; /* ให้เส้นเชื่อมอยู่ด้านหลังสุด */
+        }
+
+        #itsmainmn-connector-svg path {
+            fill: none;
+            stroke-width: 2.5px;
+            stroke-linecap: round;
+        }
+
+        #itsmainmn-connector-svg path.animated {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw-line 0.5s ease-out forwards;
+        }
+
+        @keyframes draw-line {
+            to { stroke-dashoffset: 0; }
+        }
+        
+        .itsmainmn-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center;
+            z-index: 1100; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .itsmainmn-modal-overlay.itsmainmn-show { 
+            display: flex;
+            opacity: 1; 
+        }
+        .itsmainmn-modal-content {
+            background: var(--card-bg); padding: 2rem; border-radius: 12px;
+            width: 90%; max-width: 500px; box-shadow: 0 10px 30px var(--shadow-lg);
+            transform: scale(0.95); transition: transform 0.3s ease;
+        }
+        #itsmainmn-solution-modal .itsmainmn-modal-content { border-top: 5px solid var(--success-color); }
+        #itsmainmn-contact-modal .itsmainmn-modal-content { border-top: 5px solid var(--header-bg); }
+
+        .itsmainmn-modal-overlay.itsmainmn-show .itsmainmn-modal-content { transform: scale(1); }
+        .itsmainmn-modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem; color: var(--text-primary);
+        }
+        .itsmainmn-modal-title {
+            font-size: 1.25rem; font-weight: 600; display: flex;
+            align-items: center; gap: 0.75rem;
+        }
+        .itsmainmn-modal-title .itsmainmn-icon { color: var(--success-color); }
+        #itsmainmn-contact-modal .itsmainmn-modal-title .itsmainmn-icon { color: var(--header-bg); }
+
+        .itsmainmn-close-btn {
+            font-size: 1.5rem; border: none; background: none;
+            cursor: pointer; color: var(--text-secondary);
+        }
+        .itsmainmn-modal-body {
+            font-size: 1rem; line-height: 1.6; color: var(--text-secondary);
+        }
+
+        .itsmainmn-contact-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .itsmainmn-contact-info-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .itsmainmn-contact-info-list li svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            color: var(--header-bg);
+        }
+        .itsmainmn-contact-info-list li span strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        #itsmainmn-contact-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background-color: var(--header-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 900;
+        }
+        #itsmainmn-contact-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        }
+        #itsmainmn-contact-fab svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .itsmainmn-image-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1200;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+            padding: 2rem;
+            box-sizing: border-box;
+            pointer-events: auto;
+        }
+
+        .itsmainmn-image-popup-overlay.itsmainmn-show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .itsmainmn-image-popup-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: transform 0.25s ease-in-out;
+            max-width: 70vw;
+            max-height: 90vh;
+            pointer-events: auto;
+        }
+
+        .itsmainmn-image-popup-overlay.itsmainmn-show .itsmainmn-image-popup-content {
+            transform: scale(1);
+        }
+
+        .itsmainmn-image-popup-content img {
+            width: 100%;
+            height: auto;
+            max-height: calc(90vh - 2rem);
+            display: block;
+            border-radius: 8px;
+        }
+
+
