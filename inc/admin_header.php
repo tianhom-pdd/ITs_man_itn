@@ -17,7 +17,7 @@
             </div>
             <nav>
                 <ul style="list-style:none;padding:0;margin:0;">
-                    <li><a href="dashboard.php" class="nav-link">แดชบอร์ด</a></li>
+                    <li><a href="index.php" class="nav-link">แดชบอร์ด</a></li>
                     <li><a href="categories.php" class="nav-link">จัดการหมวดหมู่</a></li>
                     <li><a href="problems.php" class="nav-link">จัดการปัญหา</a></li>
                     <li><a href="editor.php" class="nav-link">แก้ไข Flowchart</a></li>
