@@ -334,12 +334,15 @@ while ($row = $res->fetch_assoc()) $titles[] = $row;
             </td>
             <td style="padding:0.75rem;"><?= htmlspecialchars($cat['title']) ?></td>
             <td style="padding:0.75rem;text-align:right;">
-                <button onclick="openCategoryModal('edit', {
-                    id: <?= $cat['id'] ?>,
-                    name: '<?= addslashes($cat['title']) ?>',
-                    color: '<?= $cat['color'] ?>',
-                    icon: '<?= addslashes($cat['icon']) ?>'
-                })" class="adminit-btn" style="background:#eab308;color:#fff;padding:0.3rem 0.8rem;border-radius:6px;border:none;cursor:pointer;">แก้ไข</button>
+                <?php
+                    $jsData = json_encode([
+                        'id' => $cat['id'],
+                        'name' => $cat['title'],
+                        'color' => $cat['color'],
+                        'icon' => $cat['icon']
+                    ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+                ?>
+                <button onclick='openCategoryModal("edit", <?= $jsData ?>)' class="adminit-btn" style="background:#eab308;color:#fff;padding:0.3rem 0.8rem;border-radius:6px;border:none;cursor:pointer;">แก้ไข</button>
                 <a href="delete_category.php?id=<?= $cat['id'] ?>" class="adminit-btn" style="background:#dc2626;color:#fff;padding:0.3rem 0.8rem;border-radius:6px;text-decoration:none;" onclick="return confirm('ลบหมวดหมู่นี้?');">ลบ</a>
             </td>
         </tr>
@@ -527,8 +530,13 @@ function selectIcon(iconName) {
     // Update hidden input
     document.getElementById('categoryIcon').value = iconName;
     
-    // Update preview
-    document.getElementById('selectedIconPreview').innerHTML = `<use href="#icon-${iconName}"></use>`;
+    // Update preview (use DOM API for SVG <use> reliability)
+    const preview = document.getElementById('selectedIconPreview');
+    // Remove all children
+    while (preview.firstChild) preview.removeChild(preview.firstChild);
+    const useElem = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    useElem.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `#icon-${iconName}`);
+    preview.appendChild(useElem);
     document.getElementById('selectedIconName').textContent = iconName;
     
     // Update UI selection
