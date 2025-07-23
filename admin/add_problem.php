@@ -7,12 +7,28 @@ $titles = [];
 $res = $db->query("SELECT id, title FROM title_it ORDER BY title ASC");
 while ($row = $res->fetch_assoc()) $titles[] = $row;
 
+// กำหนด title_id_selected (ใช้ทั้ง GET/POST)
+$title_id_selected = 0;
+if (isset($_POST['title_id'])) {
+    $title_id_selected = intval($_POST['title_id']);
+} elseif (isset($_GET['title_id'])) {
+    $title_id_selected = intval($_GET['title_id']);
+}
+
+// ดึง node เฉพาะ title_id ที่เลือก
+$nodes = [];
+if ($title_id_selected) {
+    $res = $db->query("SELECT id, title FROM cause_it WHERE title_id = $title_id_selected ORDER BY id ASC");
+    while ($row = $res->fetch_assoc()) $nodes[] = $row;
+}
+
 // เมื่อ submit ฟอร์ม
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $text = trim($_POST['text'] ?? '');
     $type = trim($_POST['type'] ?? '');
     $title_id = intval($_POST['title_id'] ?? 0);
+    $parent_id = intval($_POST['parent_id'] ?? 0);
     $image = null;
 
     // อัปโหลดรูปถ้ามี
@@ -26,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($title && $title_id) {
-        $stmt = $db->prepare("INSERT INTO cause_it (title, text, type, image, title_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param('ssssi', $title, $text, $type, $image, $title_id);
+        $stmt = $db->prepare("INSERT INTO cause_it (title, text, type, image, title_id, parent_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('ssssii', $title, $text, $type, $image, $title_id, $parent_id);
         $stmt->execute();
         header('Location: problems.php');
         exit;
@@ -46,13 +62,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <form method="post" enctype="multipart/form-data" style="max-width:500px;">
     <div style="margin-bottom:1.2rem;">
         <label for="title_id" style="display:block; margin-bottom:0.5rem;">หมวดหมู่ <span style="color:#dc2626">*</span></label>
-        <select name="title_id" id="title_id" class="adminit-input" style="width:100%;padding:0.5rem;" required>
+        <select name="title_id" id="title_id" class="adminit-input" style="width:100%;padding:0.5rem;" required onchange="this.form.submit()">
             <option value="">-- เลือกหมวดหมู่ --</option>
             <?php foreach($titles as $cat): ?>
-                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['title']) ?></option>
+                <option value="<?= $cat['id'] ?>" <?= $title_id_selected==$cat['id']?'selected':'' ?>><?= htmlspecialchars($cat['title']) ?></option>
             <?php endforeach; ?>
         </select>
     </div>
+    <?php if ($title_id_selected): ?>
+    <div style="margin-bottom:1.2rem;">
+        <label for="parent_id" style="display:block; margin-bottom:0.5rem;">Node แม่ (Parent Node)</label>
+        <select name="parent_id" id="parent_id" class="adminit-input" style="width:100%;padding:0.5rem;">
+            <option value="0">-- ไม่มี (Node หลัก) --</option>
+            <?php foreach($nodes as $node): ?>
+                <option value="<?= $node['id'] ?>"><?= htmlspecialchars($node['title']) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <?php endif; ?>
     <div style="margin-bottom:1.2rem;">
         <label for="title" style="display:block; margin-bottom:0.5rem;">ชื่อปัญหา <span style="color:#dc2626">*</span></label>
         <input type="text" name="title" id="title" class="adminit-input" style="width:100%;padding:0.5rem;" required>

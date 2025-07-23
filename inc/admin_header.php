@@ -6,6 +6,7 @@
     <title>IT Support Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="/ITs_man_itn/assets/css/admin.css">
 </head>
 <body>
     <div class="adminit-admin-container">

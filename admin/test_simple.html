@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Modal Simple</title>
+    <style>
+        body { background: #0f172a; color: white; padding: 20px; }
+        button { padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px; }
+        button:hover { background: #4338ca; }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: #1e293b; padding: 30px; border-radius: 8px; max-width: 400px; width: 90%;
+            border: 1px solid #475569;
+        }
+        .modal-close {
+            float: right; background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;
+        }
+        input, textarea {
+            width: 100%; padding: 10px; margin: 10px 0; background: #334155; border: 1px solid #475569;
+            color: white; border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ทดสอบ Modal แบบง่าย</h1>
+    
+    <button onclick="openTestModal()">เปิด Modal ทดสอบ</button>
+    
+    <!-- Test Modal -->
+    <div id="testModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeTestModal()">&times;</button>
+            <h2>Modal ทดสอบ</h2>
+            <form>
+                <label>ชื่อ:</label>
+                <input type="text" id="testInput" placeholder="กรอกชื่อ...">
+                
+                <label>รายละเอียด:</label>
+                <textarea id="testDesc" placeholder="กรอกรายละเอียด..."></textarea>
+                
+                <button type="button" onclick="testSubmit()">บันทึก</button>
+                <button type="button" onclick="closeTestModal()">ยกเลิก</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openTestModal() {
+            console.log('Opening test modal...');
+            document.getElementById('testModal').classList.add('show');
+            document.getElementById('testInput').focus();
+        }
+        
+        function closeTestModal() {
+            console.log('Closing test modal...');
+            document.getElementById('testModal').classList.remove('show');
+        }
+        
+        function testSubmit() {
+            const name = document.getElementById('testInput').value;
+            const desc = document.getElementById('testDesc').value;
+            alert('ชื่อ: ' + name + '\nรายละเอียด: ' + desc);
+            closeTestModal();
+        }
+        
+        // ปิด modal เมื่อคลิก overlay
+        document.getElementById('testModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTestModal();
+            }
+        });
+    </script>
+</body>
+</html>
