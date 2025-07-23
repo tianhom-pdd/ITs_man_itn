@@ -71,15 +71,17 @@ $test_title = "Test Node " . date('H:i:s');
 $test_title_id = 1; // ใช้ title_id แรกในระบบ
 $test_parent_id = 0;
 
-$stmt = $db->prepare("INSERT INTO cause_it (title, title_id, parent_id) VALUES (?, ?, ?)");
+// ทดสอบ insert ด้วย schema ล่าสุด
+$test_text = "Test Text";
+$test_image = "";
+$test_type = "cause";
+$stmt = $db->prepare("INSERT INTO cause_it (title, text, image, type, title_id, parent_id) VALUES (?, ?, ?, ?, ?, ?)");
 if ($stmt) {
-    $stmt->bind_param('sii', $test_title, $test_title_id, $test_parent_id);
+    $stmt->bind_param('ssssii', $test_title, $test_text, $test_image, $test_type, $test_title_id, $test_parent_id);
     $result = $stmt->execute();
-    
     if ($result) {
         $new_id = $db->insert_id;
         echo "<p style='color: green;'>✅ การ Insert สำเร็จ! ID ใหม่: $new_id</p>";
-        
         // ลบข้อมูลทดสอบ
         $db->query("DELETE FROM cause_it WHERE id = $new_id");
         echo "<p>🗑️ ลบข้อมูลทดสอบแล้ว</p>";

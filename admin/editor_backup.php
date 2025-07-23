@@ -86,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_node'])) {
     if ($new_title && $node_id) {
         try {
             if ($image_path) {
-                $stmt = $db->prepare("UPDATE cause_it SET title = ?, description = ?, image_path = ? WHERE id = ?");
+                $stmt = $db->prepare("UPDATE cause_it SET title = ?, text = ?, image = ? WHERE id = ?");
                 $stmt->bind_param('sssi', $new_title, $new_description, $image_path, $node_id);
             } else {
-                $stmt = $db->prepare("UPDATE cause_it SET title = ?, description = ? WHERE id = ?");
+                $stmt = $db->prepare("UPDATE cause_it SET title = ?, text = ? WHERE id = ?");
                 $stmt->bind_param('ssi', $new_title, $new_description, $node_id);
             }
             

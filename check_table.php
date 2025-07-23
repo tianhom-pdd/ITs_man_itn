@@ -20,17 +20,7 @@ while($row = $result->fetch_assoc()) {
 echo "Has description column: " . ($has_description ? 'YES' : 'NO') . "\n";
 echo "Has image_path column: " . ($has_image_path ? 'YES' : 'NO') . "\n";
 
-if(!$has_description) {
-    echo "\nAdding description column...\n";
-    $db->query('ALTER TABLE cause_it ADD COLUMN description TEXT');
-    echo "Description column added.\n";
-}
 
-if(!$has_image_path) {
-    echo "\nAdding image_path column...\n";
-    $db->query('ALTER TABLE cause_it ADD COLUMN image_path VARCHAR(255)');
-    echo "Image_path column added.\n";
-}
 
 echo "\nDone!\n";
 ?>

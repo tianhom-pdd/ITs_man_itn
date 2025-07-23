@@ -1,6 +1,7 @@
 <?php include_once __DIR__ . '/inc/header.php'; ?>
 
 
+
 <main class="itsmainmn-page-container">
     <div id="itsmainmn-flowchart-main-container">
         <svg id="itsmainmn-connector-svg"></svg>
@@ -10,7 +11,12 @@
 <div class="itsmainmn-modal-overlay" id="itsmainmn-solution-modal">
     <div class="itsmainmn-modal-content">
         <div class="itsmainmn-modal-header">
-            <h2 class="itsmainmn-modal-title">
+            <h2 class="itsmainmn-        /**
+         * Draws a connector line between two nodes.
+         * @param {HTMLElement} parentEl - The starting node element.
+         * @param {HTMLElement} childEl - The ending node element.
+         */
+        const drawConnector = (parentEl, childEl) => {itle">
                 <span class="itsmainmn-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -79,6 +85,7 @@
             .then(response => response.json())
             .then(data => {
                 dbData = data;
+                window.dbData = data; // Make available globally for header search
                 console.log('dbData:', dbData);
                 buildSearchIndex();
                 initFlowchart();
@@ -89,6 +96,7 @@
 
         // --- DOM Element References ---
         const flowchartContainer = document.getElementById('itsmainmn-flowchart-main-container');
+        const pageContainer = document.querySelector('.itsmainmn-page-container');
         const svgCanvas = document.getElementById('itsmainmn-connector-svg');
         const solutionModal = document.getElementById('itsmainmn-solution-modal');
         const contactModal = document.getElementById('itsmainmn-contact-modal');
@@ -96,7 +104,11 @@
         const searchResultsContainer = document.getElementById('itsmainmn-search-results-container');
         const contactFab = document.getElementById('itsmainmn-contact-fab');
         const imagePopup = document.getElementById('itsmainmn-image-popup');
+
+
         const imagePopupImg = imagePopup ? imagePopup.querySelector('img') : null;
+        const problemSearchInput = document.getElementById('itsmainmn-problem-search-input');
+        const problemSearchResults = document.getElementById('itsmainmn-problem-search-results');
         let searchIndex = [];
 
         /**
@@ -114,6 +126,53 @@
          */
         const hideImagePopup = () => {
             if (!imagePopup) return;
+        // --- Problem Search (by cause_it.title) ---
+        if (problemSearchInput && problemSearchResults) {
+            problemSearchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim().toLowerCase();
+                problemSearchResults.innerHTML = '';
+                if (query.length < 2) {
+                    problemSearchResults.style.display = 'none';
+                    return;
+                }
+                // Find matching problems (causes)
+                const results = dbData.causes.filter(cause => (cause.title || '').toLowerCase().includes(query));
+                if (results.length === 0) {
+                    problemSearchResults.style.display = 'none';
+                    return;
+                }
+                results.forEach(cause => {
+                    // Find parent title
+                    const parentTitle = dbData.titles.find(t => t.id === cause.title_id);
+                    const parentText = parentTitle ? parentTitle.title : '';
+                    const el = document.createElement('div');
+                    el.className = 'itsmainmn-search-result-item';
+                    el.style.padding = '10px 14px';
+                    el.style.cursor = 'pointer';
+                    el.style.fontSize = '15px';
+                    el.style.borderBottom = '1px solid #f0f0f0';
+                    el.style.transition = 'background 0.15s';
+                    el.onmouseover = () => { el.style.background = '#f5f7fa'; };
+                    el.onmouseout = () => { el.style.background = '#fff'; };
+                    el.innerHTML = `<strong style='color:#2d5be3;'>${cause.title}</strong><span style='color:#888; font-size:13px; margin-left:8px;'>${parentText ? 'ใน: ' + parentText : ''}</span>`;
+                    el.addEventListener('mousedown', function(ev) {
+                        // Build flowchart to parent, then click this node
+                        buildFlowchartToNode([cause.title_id, cause.id]);
+                        problemSearchInput.value = '';
+                        problemSearchResults.innerHTML = '';
+                        problemSearchResults.style.display = 'none';
+                        ev.preventDefault();
+                    });
+                    problemSearchResults.appendChild(el);
+                });
+                problemSearchResults.style.display = 'block';
+            });
+            document.addEventListener('mousedown', function(e) {
+                if (!problemSearchResults.contains(e.target) && e.target !== problemSearchInput) {
+                    problemSearchResults.style.display = 'none';
+                }
+            });
+        }
             imagePopup.classList.remove('itsmainmn-show');
         };
         
@@ -193,22 +252,34 @@
             const iconProblem = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>';
             const iconQuestion = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 15.75h.008v.008H12v-.008z" /></svg>';
             const iconContact = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>';
-            let iconHtml = '';
 
-            if (level === 0) iconHtml = item.icon;
-            else if (level === 1) iconHtml = iconProblem;
-            else {
+            let iconHtml = '';
+            if (level === 0) {
+                // Render SVG markup as HTML, not as text
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'icon';
+                iconDiv.innerHTML = item.icon || '';
+                node.appendChild(iconDiv);
+            } else if (level === 1) {
+                iconHtml = iconProblem;
+                node.innerHTML = `<div class="icon">${iconHtml}</div>`;
+            } else {
                 switch(item.type) {
                     case 'question': iconHtml = iconQuestion; break;
                     case 'solution': iconHtml = iconWrench; break;
                     case 'contact': iconHtml = iconContact; break;
                     default: iconHtml = iconWrench;
                 }
+                node.innerHTML = `<div class="icon">${iconHtml}</div>`;
             }
 
             const title = item.title || item.text;
             const text = item.title ? item.text : '';
-            node.innerHTML = `<div class="icon">${iconHtml}</div><div class="flowchart-node-text"><h3>${title}</h3><p>${text || ''}</p></div>`;
+            // Add text content for all levels
+            const textDiv = document.createElement('div');
+            textDiv.className = 'flowchart-node-text';
+            textDiv.innerHTML = `<h3>${title}</h3><p>${text || ''}</p>`;
+            node.appendChild(textDiv);
 
             if (item.image && level > 0) {
                 const imageIcon = document.createElement('span');
@@ -235,6 +306,8 @@
          * @param {number} level - The level of the clicked node.
          */
         const handleNodeClick = (nodeEl, item, level) => {
+            // Activate connector lights
+            activateConnectorLights(nodeEl);
             hideImagePopup();
             const wasActive = nodeEl.classList.contains('active');
 
@@ -248,11 +321,18 @@
             nodeEl.parentElement.querySelectorAll('.itsmainmn-flowchart-node').forEach(n => n.classList.remove('itsmainmn-active'));
 
             if (wasActive) {
-                setTimeout(drawAllConnectors, 50);
+                setTimeout(() => {
+                    drawAllConnectors();
+                }, 50);
                 return;
             }
 
             nodeEl.classList.add('itsmainmn-active');
+            
+            // Activate light trail effect for connectors leading to this node
+            setTimeout(() => {
+                activateConnectorLights(nodeEl);
+            }, 200);
 
             // --- ปรับตรงนี้ให้แสดงลูกโหนดถูกต้องตาม parent_id ---
             let childrenData = [];
@@ -290,7 +370,7 @@
                     const adjustedTop = Math.max(flowchartContainer.scrollTop, newTop);
                     childrenContainer.style.top = `${adjustedTop}px`;
 
-                    drawAllConnectors();
+                    drawAllConnectors(); // Draw connectors for new nodes
 
                     setTimeout(() => {
                         childrenContainer.classList.add('itsmainmn-visible');
@@ -307,25 +387,30 @@
                 } else if (itemType === 'contact') {
                     showModal(contactModal);
                 }
-                setTimeout(drawAllConnectors, 50);
+                setTimeout(() => {
+                    drawAllConnectors();
+                }, 50);
             }
         };
 
         /**
          * Redraws all connectors between active nodes.
+         * @param {boolean} withLightEffect - Whether to add light trail effect to new connectors.
          */
-        const drawAllConnectors = () => {
+        const drawAllConnectors = (withLightEffect = false) => {
             if (!svgCanvas) return;
+            
+            // Always clear and redraw for consistency
             svgCanvas.innerHTML = '';
+            
             const levels = Array.from(flowchartContainer.children).filter(el => el.classList.contains('itsmainmn-flowchart-level'));
             for (let i = 0; i < levels.length - 1; i++) {
                 const parentNode = levels[i].querySelector('.itsmainmn-flowchart-node.itsmainmn-active');
                 if (parentNode) {
-                    const parentColor = getComputedStyle(parentNode).getPropertyValue('--hover-color');
                     const nextLevel = levels[i+1];
                     if(nextLevel) {
                         nextLevel.querySelectorAll('.itsmainmn-flowchart-node').forEach(childNode => {
-                            drawConnector(parentNode, childNode, parentColor);
+                            drawConnector(parentNode, childNode);
                         });
                     }
                 }
@@ -336,9 +421,8 @@
          * Draws a single bezier curve connector between two nodes.
          * @param {HTMLElement} parentEl - The starting node element.
          * @param {HTMLElement} childEl - The ending node element.
-         * @param {string} color - The color of the connector line.
          */
-        const drawConnector = (parentEl, childEl, color) => {
+        const drawConnector = (parentEl, childEl) => {
             const containerRect = flowchartContainer.getBoundingClientRect();
             const parentRect = parentEl.getBoundingClientRect();
             const childRect = childEl.getBoundingClientRect();
@@ -350,13 +434,76 @@
             
             const controlX1 = startX + (endX - startX) * 0.5;
             const controlX2 = endX - (endX - startX) * 0.5;
+            const pathData = `M ${startX} ${startY} C ${controlX1} ${startY}, ${controlX2} ${endY}, ${endX} ${endY}`;
             
+            // Get parent color
+            const parentColor = getComputedStyle(parentEl).getPropertyValue('--hover-color') || '#dc2626';
+            
+            // Main connector path
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute("d", `M ${startX} ${startY} C ${controlX1} ${startY}, ${controlX2} ${endY}, ${endX} ${endY}`);
-            path.classList.add('itsmainmn-animated');
-            path.style.stroke = color || 'var(--connector-color)';
+            path.setAttribute("d", pathData);
+            path.classList.add('animated');
+            path.style.stroke = parentColor;
+            
+            // Add data attributes for later reference
+            path.dataset.parentId = parentEl.dataset.id;
+            path.dataset.childId = childEl.dataset.id;
+            path.dataset.pathData = pathData;
+            path.dataset.parentColor = parentColor;
+            
             svgCanvas.appendChild(path);
         }
+
+        /**
+         * Activates highlighting on connectors leading to a specific node.
+         * @param {HTMLElement} targetNode - The target node element.
+         */
+        const activateConnectorLights = (targetNode) => {
+            const targetId = targetNode.dataset.id;
+            const allPaths = svgCanvas.querySelectorAll('path');
+            
+            // Reset all paths to normal state
+            allPaths.forEach(path => {
+                path.classList.remove('active-connector');
+                // Reset to original color
+                const originalColor = path.dataset.parentColor || '#dc2626';
+                path.style.stroke = originalColor;
+                path.style.strokeWidth = '2.5px';
+                path.style.filter = 'none';
+            });
+            
+            // Find and activate paths leading to this node
+            allPaths.forEach(path => {
+                if (path.dataset.childId === targetId) {
+                    const parentColor = path.dataset.parentColor || '#dc2626';
+                    
+                    // Create lighter version of the parent color for active state
+                    const lighterColor = lightenColor(parentColor, 20);
+                    
+                    path.classList.add('active-connector');
+                    path.style.stroke = lighterColor;
+                    path.style.strokeWidth = '3px';
+                    path.style.filter = `drop-shadow(0 0 3px ${parentColor}80)`;
+                }
+            });
+        };
+        
+        /**
+         * Helper function to lighten a hex color
+         * @param {string} color - Hex color string
+         * @param {number} amount - Amount to lighten (0-100)
+         * @returns {string} Lightened hex color
+         */
+        const lightenColor = (color, amount) => {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * amount);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        };
 
         /**
          * Initializes or resets the flowchart to its initial state.
@@ -378,6 +525,9 @@
             });
             setTimeout(() => level0.classList.add('itsmainmn-visible'), 50);
         }
+        
+        // Make initFlowchart available globally for header search
+        window.initFlowchart = initFlowchart;
         
         // --- Search Functionality ---
         const handleSearch = (event) => {

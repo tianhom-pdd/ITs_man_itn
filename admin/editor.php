@@ -58,10 +58,10 @@ $success_message = isset($_GET['success']) ? $_GET['success'] : '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_node'])) {
     $node_id = intval($_POST['node_id']);
     $new_title = trim($_POST['new_title']);
-    $new_description = trim($_POST['new_description']);
+    $new_text = trim($_POST['new_text']);
     $current_parent_id = isset($_POST['current_parent_id']) ? intval($_POST['current_parent_id']) : 0;
     
-    $image_path = '';
+    $image = '';
     
     // จัดการการอัพโหลดรูปภาพ
     if (isset($_FILES['node_image']) && $_FILES['node_image']['error'] === UPLOAD_ERR_OK) {
@@ -78,19 +78,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_node'])) {
             $upload_path = $upload_dir . $new_filename;
             
             if (move_uploaded_file($_FILES['node_image']['tmp_name'], $upload_path)) {
-                $image_path = 'uploads/nodes/' . $new_filename;
+                $image = 'uploads/nodes/' . $new_filename;
             }
         }
     }
     
     if ($new_title && $node_id) {
         try {
-            if ($image_path) {
-                $stmt = $db->prepare("UPDATE cause_it SET title = ?, description = ?, image_path = ? WHERE id = ?");
-                $stmt->bind_param('sssi', $new_title, $new_description, $image_path, $node_id);
+            if ($image) {
+                $stmt = $db->prepare("UPDATE cause_it SET title = ?, text = ?, image = ? WHERE id = ?");
+                $stmt->bind_param('sssi', $new_title, $new_text, $image, $node_id);
             } else {
-                $stmt = $db->prepare("UPDATE cause_it SET title = ?, description = ? WHERE id = ?");
-                $stmt->bind_param('ssi', $new_title, $new_description, $node_id);
+                $stmt = $db->prepare("UPDATE cause_it SET title = ?, text = ? WHERE id = ?");
+                $stmt->bind_param('ssi', $new_title, $new_text, $node_id);
             }
             
             if ($stmt->execute()) {
