@@ -153,136 +153,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_summary'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_child_node'])) {
     $parent_id = intval($_POST['parent_id']);
     $child_title = trim($_POST['child_title']);
-    $child_description = trim($_POST['child_description']);
+    $child_text = trim($_POST['child_description']);
     $current_parent_id = isset($_POST['current_parent_id']) ? intval($_POST['current_parent_id']) : 0;
-    
-    // Debug log
-    error_log("Add Child Node: parent_id=$parent_id, title='$child_title', title_id=$title_id");
-    
-    $image_path = '';
-    
-    // จัดการการอัพโหลดรูปภาพ
+    $type = 'cause'; // default type, ปรับตาม logic ได้
+    $image = '';
+
+    // อัปโหลดรูปภาพ
     if (isset($_FILES['child_image']) && $_FILES['child_image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = __DIR__ . '/../uploads/nodes/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
         }
-        
         $file_extension = strtolower(pathinfo($_FILES['child_image']['name'], PATHINFO_EXTENSION));
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        
         if (in_array($file_extension, $allowed_extensions)) {
             $new_filename = 'node_' . time() . '.' . $file_extension;
             $upload_path = $upload_dir . $new_filename;
-            
             if (move_uploaded_file($_FILES['child_image']['tmp_name'], $upload_path)) {
-                $image_path = 'uploads/nodes/' . $new_filename;
+                $image = $new_filename;
             }
         }
     }
-    
+
     if ($child_title && $title_id) {
         try {
-            // จัดการ parent_id: ถ้าเป็น 0 ให้ใช้ NULL สำหรับ Level 1 nodes
             $db_parent_id = ($parent_id == 0) ? null : $parent_id;
-            
-            // เตรียม SQL statement
-            $sql = "INSERT INTO cause_it (title, description, image_path, title_id, parent_id) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO cause_it (title, text, image, type, title_id, parent_id) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $db->prepare($sql);
-            
-            if (!$stmt) {
-                throw new Exception("Prepare failed: " . $db->error);
-            }
-            
-            // Bind parameters
+            if (!$stmt) throw new Exception("Prepare failed: " . $db->error);
             if ($db_parent_id === null) {
-                // สำหรับ NULL parent_id (Level 1 nodes)
-                $stmt->bind_param('sssis', $child_title, $child_description, $image_path, $title_id, $db_parent_id);
+                $stmt->bind_param('ssssii', $child_title, $child_text, $image, $type, $title_id, $db_parent_id);
             } else {
-                // สำหรับ parent_id ที่มีค่า
-                $stmt->bind_param('sssii', $child_title, $child_description, $image_path, $title_id, $db_parent_id);
+                $stmt->bind_param('ssssii', $child_title, $child_text, $image, $type, $title_id, $db_parent_id);
             }
-            
             $result = $stmt->execute();
-            
-            if (!$result) {
-                throw new Exception("Execute failed: " . $stmt->error);
-            }
-            
+            if (!$result) throw new Exception("Execute failed: " . $stmt->error);
             $new_id = $db->insert_id;
             $stmt->close();
-            
-            error_log("Insert successful: new node ID = $new_id");
-            
             header("Location: editor.php?title_id=$title_id&parent_id=$current_parent_id&success=" . urlencode("เพิ่ม Node สำเร็จ"));
             exit;
-            
         } catch (Exception $e) {
             $error_message = 'เกิดข้อผิดพลาด: ' . $e->getMessage();
-            error_log("Database error: " . $e->getMessage());
         }
     } else {
         $error_message = 'กรุณากรอกชื่อ Node ลูก';
-        error_log("Validation error: child_title='$child_title', title_id=$title_id");
     }
 }
 
+// Handle add node inline
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_node_inline'])) {
     $parent_id = intval($_POST['parent_id']);
     $title = trim($_POST['title']);
     $current_parent_id = isset($_POST['current_parent_id']) ? intval($_POST['current_parent_id']) : 0;
-    
-    // Debug: แสดงค่าที่ได้รับ
-    error_log("Debug: POST data - parent_id: $parent_id, title: '$title', title_id: $title_id");
-    
+    $type = 'cause'; // default type
+    $image = '';
+    $text = '';
     if ($title && $title_id) {
         try {
-            // ตรวจสอบการเชื่อมต่อ database
-            if (!$db) {
-                throw new Exception("Database connection failed");
-            }
-            
-            // จัดการ parent_id: ถ้าเป็น 0 ให้ใช้ NULL สำหรับ Level 1 nodes
             $db_parent_id = ($parent_id == 0) ? null : $parent_id;
-            
-            // เตรียม SQL statement
-            $sql = "INSERT INTO cause_it (title, description, image_path, title_id, parent_id) VALUES (?, ?, ?, ?, ?)";
-            error_log("Debug: SQL - $sql");
-            error_log("Debug: Values - title: '$title', title_id: $title_id, parent_id: " . ($db_parent_id === null ? 'NULL' : $db_parent_id));
-            
+            $sql = "INSERT INTO cause_it (title, text, image, type, title_id, parent_id) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $db->prepare($sql);
-            if (!$stmt) {
-                throw new Exception("Prepare failed: " . $db->error);
-            }
-            
-            // ใช้ parameter type ที่เหมาะสม
+            if (!$stmt) throw new Exception("Prepare failed: " . $db->error);
             if ($db_parent_id === null) {
-                $stmt->bind_param('sssis', $title, '', '', $title_id, $db_parent_id);
+                $stmt->bind_param('ssssii', $title, $text, $image, $type, $title_id, $db_parent_id);
             } else {
-                $stmt->bind_param('sssii', $title, '', '', $title_id, $db_parent_id);
+                $stmt->bind_param('ssssii', $title, $text, $image, $type, $title_id, $db_parent_id);
             }
-            
             $result = $stmt->execute();
-            
-            if (!$result) {
-                throw new Exception("Execute failed: " . $stmt->error);
-            }
-            
+            if (!$result) throw new Exception("Execute failed: " . $stmt->error);
             $new_id = $db->insert_id;
-            error_log("Debug: Insert successful, new ID: $new_id");
-            
             $stmt->close();
-            
             header("Location: editor.php?title_id=$title_id&parent_id=$current_parent_id&success=" . urlencode("เพิ่ม Node สำเร็จ"));
             exit;
-            
         } catch (Exception $e) {
             $add_node_error = 'เกิดข้อผิดพลาด: ' . $e->getMessage();
-            error_log("Database error: " . $e->getMessage());
         }
     } else {
         $add_node_error = 'กรุณากรอกชื่อ node';
-        error_log("Validation error: title='$title', title_id=$title_id");
     }
     $add_node_parent = $parent_id;
 }
